@@ -9,7 +9,7 @@
         {
             "ruta" : "alert",
             "icon" : "add_alert",
-            "texto": "Alertas"
+            "texto": "Consulta de estado"
         },
         {
             "ruta" : "statistics",

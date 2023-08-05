@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 
+
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
 
@@ -10,6 +11,10 @@ class ControlPage extends StatefulWidget {
 
 class _ControlPageState extends State<ControlPage> {
   bool _switchCurrentValue = false;
+
+
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,6 +64,7 @@ class _ControlPageState extends State<ControlPage> {
             setState(() {
               _switchCurrentValue = valueIn;
             });
+            
           },
         ),
       ),

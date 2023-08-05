@@ -3,10 +3,12 @@ import 'package:smarttank/src/elements/menu_elements.dart';
 import '../utils/icono_string_util.dart';
 import 'statistics_page.dart';
 
+
 class HomePage extends StatelessWidget {
   const HomePage({Key? key}) : super(key: key);
   @override
   Widget build(BuildContext context) {
+
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(150),
@@ -30,16 +32,15 @@ class HomePage extends StatelessWidget {
                       Color.fromARGB(255, 11, 38, 85),
                       Color.fromARGB(255, 132, 168, 229)
                     ])),
-              )
-              ),
+              )),
         ),
-        
       ),
       body: _lista(),
     );
   }
 
-Widget _lista() {
+  Widget _lista()  {
+   
     //menuProvider.cargarData()
     return FutureBuilder(
       future: menuElements.cargarData(),

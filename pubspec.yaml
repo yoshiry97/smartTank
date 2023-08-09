@@ -39,6 +39,8 @@ dependencies:
   flutter_switch: ^0.3.2
   http: ^1.1.0
   syncfusion_flutter_gauges: ^22.2.7
+  fl_chart: ^0.63.0
+  syncfusion_flutter_charts: ^22.2.8
 
 dev_dependencies:
   flutter_test:

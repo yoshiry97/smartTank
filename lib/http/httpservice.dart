@@ -1,6 +1,5 @@
 //import 'dart:html';
 
-import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
@@ -35,17 +34,6 @@ class HttpService {
     }
   }
 
-  // Agrega otros métodos como PUT, DELETE, etc., según tus necesidades.
-
-  // Por ejemplo:
-  // Future<dynamic> put(String endpoint, {Map<String, String> headers, dynamic body}) async {
-  //   // Código para hacer una petición PUT
-  // }
-
-  // Future<dynamic> delete(String endpoint, {Map<String, String> headers}) async {
-  //   // Código para hacer una petición DELETE
-  // }
-
   Future<String> getAccessToken() async {
     var dataToSend = <String, String>{};
     dataToSend.addAll({
@@ -73,12 +61,34 @@ class HttpService {
     var accessToken = await getAccessToken();
     final response = await get(
         'things/bc343efd-d578-418c-b510-b9967bbdaffa/properties',
-        headers: {"authorization": "Bearer " + accessToken});
+        headers: {"authorization": "Bearer $accessToken"});
 
     //print(response[0]);
     var thing = jsonDecode(response);
-    print(thing);
+    //print(thing);
     return thing;
   }
 
+  Future<void> updateFlujo(bool newFlujo) async {
+    var accessToken = await getAccessToken();
+    final url = Uri.parse(
+        'https://api2.arduino.cc/iot/v2/things/bc343efd-d578-418c-b510-b9967bbdaffa/properties/5a85dcbf-7c3d-44aa-a6b5-bac984aabb4d/publish');
+    final headers = {
+      'Content-Type': 'application/json',
+      'Authorization':
+          'Bearer $accessToken', // Reemplaza con tu token de acceso
+    };
+
+    final body = jsonEncode({'value': newFlujo});
+
+    final response = await http.put(url, headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+      print('Flujo actualizado exitosamente');
+    } else {
+      print('Error al actualizar el flujo');
+      print('Código de estado: ${response.statusCode}');
+      print('Cuerpo de respuesta: ${response.body}');
+    }
+  }
 }

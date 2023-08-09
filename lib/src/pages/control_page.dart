@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
-import '../../apis/apis.dart';
+import '../../http/httpservice.dart';
 
 class ControlPage extends StatefulWidget {
   const ControlPage({super.key});
@@ -11,61 +11,69 @@ class ControlPage extends StatefulWidget {
 }
 
 class _ControlPageState extends State<ControlPage> {
-  //bool _switchCurrentValue = false;
-  //bool _switchCurrentValue = true;
   bool _switchCurrentValue = false;
-  late bool? _estadoSwitch;
-
   late List accessToken;
+  late bool? estadoSwitch;
   var service = HttpService();
+  //double volumen = 0.0;
+
+  void _toggleFlujo(bool newValue) {
+    setState(() {
+      _switchCurrentValue = newValue;
+    });
+  }
 
   @override
   void initState() {
     super.initState();
+    print("InitState: Inicio de initState");
     service.getThings().then((value) {
       setState(() {
         accessToken = value;
-        _estadoSwitch = value[2]['last_value'];
-        _switchCurrentValue = _estadoSwitch ?? false; 
       });
-      //bool _estadoSwitch = value[2]['last_value'];
-      //_switchCurrentValue = _estadoSwitch;
-      print(value[2]['last_value']);
+      bool estadoSwitch = value[4]['last_value'];
+      _switchCurrentValue = estadoSwitch;
+      //volumen = value[3]['last_value'];
+      print(value[3]['last_value']);
+      print(value[4]['last_value']);
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    print("Build: Construyendo la interfaz de usuario");
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(150),
+        preferredSize: const Size.fromHeight(150),
         child: Container(
           padding: const EdgeInsets.all(5),
           child: AppBar(
-              centerTitle: true,
-              toolbarHeight: 250,
-              title: Image.asset(
-                'assets/SmartTank.png',
-                //width: 100,
-                height: 150,
-                fit: BoxFit.fitHeight,
+            centerTitle: true,
+            toolbarHeight: 250,
+            title: Image.asset(
+              'assets/SmartTank.png',
+              height: 150,
+              fit: BoxFit.fitHeight,
+            ),
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Color.fromARGB(255, 11, 38, 85),
+                    Color.fromARGB(255, 132, 168, 229),
+                  ],
+                ),
               ),
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.topRight,
-                        colors: [
-                      Color.fromARGB(255, 11, 38, 85),
-                      Color.fromARGB(255, 132, 168, 229)
-                    ])),
-              )),
+            ),
+          ),
         ),
       ),
       body: Column(
         children: [
           Container(
-            padding: EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20.0),
             child: Center(
               child: FlutterSwitch(
                 activeText: 'Sistema Encendido',
@@ -73,9 +81,9 @@ class _ControlPageState extends State<ControlPage> {
                 value: _switchCurrentValue,
                 toggleSize: 35.0,
                 activeTextColor: Colors.black,
-                activeColor: Color.fromARGB(255, 132, 168, 229),
-                activeToggleColor: Color.fromARGB(255, 11, 38, 85),
-                inactiveToggleColor: Color.fromARGB(255, 239, 241, 244),
+                activeColor: const Color.fromARGB(255, 132, 168, 229),
+                activeToggleColor: const Color.fromARGB(255, 11, 38, 85),
+                inactiveToggleColor: const Color.fromARGB(255, 239, 241, 244),
                 inactiveTextColor: Colors.white,
                 inactiveColor: const Color.fromARGB(255, 11, 38, 85),
                 valueFontSize: 16.0,
@@ -83,10 +91,11 @@ class _ControlPageState extends State<ControlPage> {
                 height: 50,
                 borderRadius: 20.0,
                 showOnOff: true,
-                onToggle: (bool valueIn) {
+                onToggle: (bool valueIn) async {
                   setState(() {
                     _switchCurrentValue = valueIn;
                   });
+                  await service.updateFlujo(valueIn);
                 },
               ),
             ),
@@ -94,28 +103,41 @@ class _ControlPageState extends State<ControlPage> {
           Container(
             padding: const EdgeInsets.all(20.0),
             child: const Text(
-              "Capacidad actual del tinaco:",
+              "Nivel de Agua en tu Smart Tank:",
               style: TextStyle(fontSize: 20.0),
             ),
           ),
           SfRadialGauge(
             axes: <RadialAxis>[
-              RadialAxis(minimum: 0, maximum: 60, ranges: <GaugeRange>[
-                GaugeRange(startValue: 0, endValue: 20, color: Colors.red),
-                GaugeRange(startValue: 20, endValue: 40, color: Colors.orange),
-                GaugeRange(startValue: 40, endValue: 60, color: Colors.green)
-              ], pointers: const <GaugePointer>[
-                NeedlePointer(value: 60)
-              ], annotations: const <GaugeAnnotation>[
-                GaugeAnnotation(
-                    widget: Text('60 litros',
-                        style: TextStyle(
-                            fontSize: 25, fontWeight: FontWeight.bold)),
+              RadialAxis(
+                minimum: 0,
+                maximum: 100,
+                ranges: <GaugeRange>[
+                  GaugeRange(startValue: 0, endValue: 33, color: Colors.red),
+                  GaugeRange(
+                      startValue: 33, endValue: 66, color: Colors.orange),
+                  GaugeRange(
+                      startValue: 66, endValue: 100, color: Colors.green),
+                ],
+                pointers: <GaugePointer>[
+                 NeedlePointer(value: 10.0),
+                ],
+                annotations: const <GaugeAnnotation>[
+                  GaugeAnnotation(
+                    widget: Text(
+                      '%',
+                      style: TextStyle(
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
                     angle: 90,
-                    positionFactor: 0.5)
-              ])
+                    positionFactor: 0.5,
+                  ),
+                ],
+              ),
             ],
-          )
+          ),
         ],
       ),
     );

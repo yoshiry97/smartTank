@@ -6,9 +6,9 @@ import '../pages/statistics_page.dart';
 
 Map<String, WidgetBuilder> getApplicationRoutes() {
   return <String, WidgetBuilder>{
-    '/': (BuildContext) => HomePage(),
-    'alert': (BuildContext) => AlertPage(),
-    'statistics': (BuildContext) => StatisticsPage(),
-    'control': (BuildContext) => ControlPage(),
+    '/': (BuildContext) => const HomePage(),
+    'alert': (BuildContext) => const AlertPage(),
+    'statistics': (BuildContext) => const StatisticsPage(),
+    'control': (BuildContext) => const ControlPage(),
   };
 }

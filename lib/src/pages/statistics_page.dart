@@ -1,37 +1,102 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+import '../../http/httpservice.dart';
 
-class StatisticsPage extends StatelessWidget {
-  const StatisticsPage({super.key});
+class StatisticsPage extends StatefulWidget {
+  const StatisticsPage({Key? key}) : super(key: key);
+
+  @override
+  _StatisticsPageState createState() => _StatisticsPageState();
+}
+
+class _StatisticsPageState extends State<StatisticsPage> {
+  late double _litros = 10.0;
+  // Variable para almacenar los litros obtenidos de la API
+  var service = HttpService();
+  late TooltipBehavior _tooltipBehavior;
+
+  @override
+  void initState() {
+    _tooltipBehavior = TooltipBehavior(enable: true);
+    super.initState();
+    _fetchLitrosData(); // Llamar a la función para obtener los datos de litros al inicio
+  }
+
+  Future<void> _fetchLitrosData() async {
+    try {
+      dynamic response = await service.getThings();
+      setState(() {
+        _litros = double.parse(response[5]['last_value']);
+      });
+    } catch (error) {
+      print('Error fetching litros data: $error');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-     return Scaffold(
+    return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(150),
+        preferredSize: const Size.fromHeight(150),
         child: Container(
           padding: const EdgeInsets.all(5),
           child: AppBar(
-              centerTitle: true,
-              toolbarHeight: 250,
-              title: Image.asset(
-                'assets/SmartTank.png',
-                //width: 100,
-                height: 150,
-                fit: BoxFit.fitHeight,
+            centerTitle: true,
+            toolbarHeight: 250,
+            title: Image.asset(
+              'assets/SmartTank.png',
+              height: 150,
+              fit: BoxFit.fitHeight,
+            ),
+            flexibleSpace: Container(
+              decoration: const BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topLeft,
+                  end: Alignment.topRight,
+                  colors: [
+                    Color.fromARGB(255, 11, 38, 85),
+                    Color.fromARGB(255, 132, 168, 229),
+                  ],
+                ),
               ),
-              flexibleSpace: Container(
-                decoration: const BoxDecoration(
-                    gradient: LinearGradient(
-                        begin: Alignment.topLeft,
-                        end: Alignment.topRight,
-                        colors: [
-                      Color.fromARGB(255, 11, 38, 85),
-                      Color.fromARGB(255, 132, 168, 229)
-                    ])),
-              )),
-              
+            ),
+          ),
+        ),
+      ),
+      body: Center(
+        child: Container(
+          child: SfCartesianChart(
+            primaryXAxis: CategoryAxis(),
+            // Chart title
+            title: ChartTitle(text: 'Consumo de litros por día'),
+            // Enable legend
+            legend: Legend(isVisible: true),
+            // Enable tooltip
+            tooltipBehavior: _tooltipBehavior,
+            series: <LineSeries<UsageData, String>>[
+              LineSeries<UsageData, String>(
+                dataSource: <UsageData>[
+                  UsageData('Lunes', 35),
+                  UsageData('Martes', 28),
+                  UsageData('Miércoles', 34),
+                  UsageData('Jueves', 32),
+                  UsageData('Viernes', 40),
+                ],
+                xValueMapper: (UsageData uso, _) => uso.day,
+                yValueMapper: (UsageData uso, _) => uso.litros, // Corregido aquí
+                // Enable data label
+                dataLabelSettings: DataLabelSettings(isVisible: true),
+              ),
+            ],
+          ),
         ),
       ),
     );
   }
+}
+
+class UsageData {
+  UsageData(this.day, this.litros);
+  final String day;
+  final double litros;
 }

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:smarttank/src/elements/menu_elements.dart';
 import '../utils/icono_string_util.dart';
-import 'statistics_page.dart';
+
 
 
 class HomePage extends StatelessWidget {
@@ -11,7 +11,7 @@ class HomePage extends StatelessWidget {
 
     return Scaffold(
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(150),
+        preferredSize: const Size.fromHeight(150),
         child: Container(
           padding: const EdgeInsets.all(5),
           child: AppBar(
@@ -44,7 +44,7 @@ class HomePage extends StatelessWidget {
     //menuProvider.cargarData()
     return FutureBuilder(
       future: menuElements.cargarData(),
-      initialData: [],
+      initialData: const [],
       builder: (context, AsyncSnapshot<List<dynamic>> snapshot) {
         print(snapshot.data);
         return ListView(
@@ -56,11 +56,11 @@ class HomePage extends StatelessWidget {
 
   List<Widget> _listaItems(List<dynamic> data, BuildContext context) {
     final List<Widget> opciones = [];
-    data.forEach((opt) {
+    for (var opt in data) {
       final widgetTemp = ListTile(
         title: Text(opt['texto']),
         leading: getIcon(opt['icon']),
-        trailing: Icon(Icons.keyboard_arrow_right, color: Colors.blue),
+        trailing: const Icon(Icons.keyboard_arrow_right, color: Colors.blue),
         onTap: () {
           Navigator.pushNamed(context, opt['ruta']);
           //final route = MaterialPageRoute(builder: (context)=> AlertPage());
@@ -69,8 +69,8 @@ class HomePage extends StatelessWidget {
       );
       opciones
         ..add(widgetTemp)
-        ..add(Divider());
-    });
+        ..add(const Divider());
+    }
     return opciones;
   }
 }

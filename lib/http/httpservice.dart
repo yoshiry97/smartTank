@@ -3,6 +3,8 @@
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
+import '../models/things_properties.dart';
+
 class HttpService {
   String baseUrl = "https://api2.arduino.cc/iot/v2";
 
@@ -68,6 +70,17 @@ class HttpService {
     //print(thing);
     return thing;
   }
+
+  Future<List<ThingsProperty>> getThingsV2() async {
+  var accessToken = await getAccessToken();
+  final response = await get(
+      'things/bc343efd-d578-418c-b510-b9967bbdaffa/properties',
+      headers: {"authorization": "Bearer $accessToken"});
+
+  var propertiesJson = jsonDecode(response) as List<dynamic>;
+  List<ThingsProperty> properties = propertiesJson.map((json) => ThingsProperty.fromJson(json)).toList();
+  return properties;
+}
 
   Future<void> updateFlujo(bool newFlujo) async {
     var accessToken = await getAccessToken();

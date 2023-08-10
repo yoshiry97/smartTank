@@ -13,9 +13,9 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   bool _switchCurrentValue = false;
   late List accessToken;
-  late bool? estadoSwitch;
+  //late bool? estadoSwitch;
   var service = HttpService();
-  //double volumen = 0.0;
+  double volumen = 0.0;
 
   void _toggleFlujo(bool newValue) {
     setState(() {
@@ -27,15 +27,21 @@ class _ControlPageState extends State<ControlPage> {
   void initState() {
     super.initState();
     print("InitState: Inicio de initState");
-    service.getThings().then((value) {
+    service.getThingsV2().then((value) {
       setState(() {
         accessToken = value;
       });
-      bool estadoSwitch = value[4]['last_value'];
-      _switchCurrentValue = estadoSwitch;
-      //volumen = value[3]['last_value'];
-      print(value[3]['last_value']);
-      print(value[4]['last_value']);
+
+      value.forEach((element) {
+        if (element.name == 'flujo') {
+          _switchCurrentValue = (element.lastValue as bool);
+          print("valor del switch " + _switchCurrentValue.toString());
+        }
+        if (element.name == 'volumen') {
+          volumen = (element.lastValue as double);
+          print("valor del volumen " + volumen.toString());
+        }
+      });
     });
   }
 
@@ -120,7 +126,7 @@ class _ControlPageState extends State<ControlPage> {
                       startValue: 66, endValue: 100, color: Colors.green),
                 ],
                 pointers: <GaugePointer>[
-                 NeedlePointer(value: 10.0),
+                  NeedlePointer(value: volumen),
                 ],
                 annotations: const <GaugeAnnotation>[
                   GaugeAnnotation(

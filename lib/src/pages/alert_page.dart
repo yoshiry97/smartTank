@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 
+import '../../http/httpservice.dart';
+
 class AlertPage extends StatefulWidget {
   const AlertPage({Key? key}) : super(key: key);
 
@@ -9,7 +11,34 @@ class AlertPage extends StatefulWidget {
 }
 
 class _AlertPageState extends State<AlertPage> {
-  final bool _flujo = false; // Variable de estado para controlar el mensaje de alerta
+  //final bool _flujo = true; // Variable de estado para controlar el mensaje de alerta
+  late List accessToken;
+  bool flujo = false;
+  var service = HttpService();
+  double capacidad = 0.0;
+
+
+  @override
+  void initState() {
+    super.initState();
+    print("InitState: Inicio de initState");
+    service.getThingsV2().then((value) {
+      setState(() {
+        accessToken = value;
+      });
+
+      value.forEach((element) {
+        if (element.name == 'flujo') {
+          flujo = (element.lastValue as bool);
+          print("valor del switch " + flujo.toString());
+        }
+        if (element.name == 'capacidad') {
+          capacidad = (element.lastValue as double);
+          print("valor del capacidad " + capacidad.toString());
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -49,7 +78,8 @@ class _AlertPageState extends State<AlertPage> {
             const SizedBox(height: 5), // Separación entre AppBar y el botón
             ElevatedButton(
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                 backgroundColor: Color.fromARGB(255, 17, 83, 197),
                 textStyle: const TextStyle(fontSize: 18),
                 shape: RoundedRectangleBorder(
@@ -62,12 +92,19 @@ class _AlertPageState extends State<AlertPage> {
               ),
               onPressed: () => _mostrarAlert(context),
             ),
-            const SizedBox(height: 15), // Separación entre el botón y la capacidad del tinaco
+            const SizedBox(
+                height:
+                    15), // Separación entre el botón y la capacidad del tinaco
             const Text(
               'Litros disponibles',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 38, 73, 135)),
+              style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 38, 73, 135)),
             ),
-            const SizedBox(height: 10), // Separación entre la capacidad del tinaco y el LinearGauge
+            const SizedBox(
+                height:
+                    10), // Separación entre la capacidad del tinaco y el LinearGauge
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: SfLinearGauge(
@@ -80,7 +117,8 @@ class _AlertPageState extends State<AlertPage> {
                 ),
                 barPointers: [
                   LinearBarPointer(
-                    value: 30, // Cambia este valor para reflejar la capacidad actual del tinaco
+                    value:
+                        capacidad, // Cambia este valor para reflejar la capacidad actual del tinaco
                     color: Color.fromARGB(255, 115, 171, 216),
                   ),
                 ],
@@ -89,12 +127,11 @@ class _AlertPageState extends State<AlertPage> {
           ],
         ),
       ),
-      
     );
   }
 
   void _mostrarAlert(BuildContext context) {
-    String alertMessage = _flujo
+    String alertMessage = flujo
         ? 'Tu tinaco tiene presión de agua'
         : 'En este momento tu tinaco no tiene presión de agua';
 

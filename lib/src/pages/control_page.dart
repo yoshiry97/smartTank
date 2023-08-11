@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_switch/flutter_switch.dart';
 import 'package:syncfusion_flutter_gauges/gauges.dart';
 import '../../http/httpservice.dart';
@@ -13,7 +14,8 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   bool _switchCurrentValue = false;
   late List accessToken;
-  //late bool? estadoSwitch;
+  bool _isLoading =
+      true; // Nuevo estado para controlar la visibilidad de la animación de carga
   var service = HttpService();
   double volumen = 0.0;
 
@@ -30,6 +32,7 @@ class _ControlPageState extends State<ControlPage> {
     service.getThingsV2().then((value) {
       setState(() {
         accessToken = value;
+        _isLoading = false; // Cambia el estado de la animación de carga
       });
 
       value.forEach((element) {
@@ -113,7 +116,12 @@ class _ControlPageState extends State<ControlPage> {
               style: TextStyle(fontSize: 20.0),
             ),
           ),
-          SfRadialGauge(
+          _isLoading
+              ? SpinKitWave(
+                  color: Colors.blue, // Color de la animación de carga
+                  size: 50.0, // Tamaño de la animación
+                )
+         : SfRadialGauge(
             axes: <RadialAxis>[
               RadialAxis(
                 minimum: 0,

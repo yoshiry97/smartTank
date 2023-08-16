@@ -17,7 +17,6 @@ class _AlertPageState extends State<AlertPage> {
   var service = HttpService();
   double capacidad = 0.0;
 
-
   @override
   void initState() {
     super.initState();
@@ -36,6 +35,7 @@ class _AlertPageState extends State<AlertPage> {
           capacidad = (element.lastValue as double);
           print("valor del capacidad " + capacidad.toString());
         }
+
       });
     });
   }

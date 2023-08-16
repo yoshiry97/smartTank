@@ -13,21 +13,32 @@ class _StatisticsPageState extends State<StatisticsPage> {
   late double _litros = 10.0;
   // Variable para almacenar los litros obtenidos de la API
   var service = HttpService();
+  late List accessToken;
   late TooltipBehavior _tooltipBehavior;
 
   @override
   void initState() {
     _tooltipBehavior = TooltipBehavior(enable: true);
     super.initState();
+    print("InitState: Inicio de initState");
     _fetchLitrosData(); // Llamar a la función para obtener los datos de litros al inicio
   }
 
   Future<void> _fetchLitrosData() async {
     try {
       dynamic response = await service.getThings();
-      setState(() {
-        _litros = double.parse(response[5]['last_value']);
-      });
+      service.getThingsV2().then(
+        (value) {
+          setState(() {
+            accessToken = value;
+          });
+          value.forEach((element) {
+            if (element.name == 'litros') {
+              
+            }
+          });
+        },
+      );
     } catch (error) {
       print('Error fetching litros data: $error');
     }
@@ -81,9 +92,12 @@ class _StatisticsPageState extends State<StatisticsPage> {
                   UsageData('Miércoles', 34),
                   UsageData('Jueves', 32),
                   UsageData('Viernes', 40),
+                   UsageData('Sábado', 32),
+                  UsageData('Domingo', 40),
                 ],
                 xValueMapper: (UsageData uso, _) => uso.day,
-                yValueMapper: (UsageData uso, _) => uso.litros, // Corregido aquí
+                yValueMapper: (UsageData uso, _) =>
+                    uso.litros, // Corregido aquí
                 // Enable data label
                 dataLabelSettings: DataLabelSettings(isVisible: true),
               ),

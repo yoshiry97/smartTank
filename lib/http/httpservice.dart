@@ -72,15 +72,16 @@ class HttpService {
   }
 
   Future<List<ThingsProperty>> getThingsV2() async {
-  var accessToken = await getAccessToken();
-  final response = await get(
-      'things/bc343efd-d578-418c-b510-b9967bbdaffa/properties',
-      headers: {"authorization": "Bearer $accessToken"});
+    var accessToken = await getAccessToken();
+    final response = await get(
+        'things/bc343efd-d578-418c-b510-b9967bbdaffa/properties',
+        headers: {"authorization": "Bearer $accessToken"});
 
-  var propertiesJson = jsonDecode(response) as List<dynamic>;
-  List<ThingsProperty> properties = propertiesJson.map((json) => ThingsProperty.fromJson(json)).toList();
-  return properties;
-}
+    var propertiesJson = jsonDecode(response) as List<dynamic>;
+    List<ThingsProperty> properties =
+        propertiesJson.map((json) => ThingsProperty.fromJson(json)).toList();
+    return properties;
+  }
 
   Future<void> updateFlujo(bool newFlujo) async {
     var accessToken = await getAccessToken();
@@ -104,4 +105,6 @@ class HttpService {
       print('Cuerpo de respuesta: ${response.body}');
     }
   }
+
+
 }

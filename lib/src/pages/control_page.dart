@@ -14,8 +14,7 @@ class ControlPage extends StatefulWidget {
 class _ControlPageState extends State<ControlPage> {
   bool _switchCurrentValue = false;
   late List accessToken;
-  bool _isLoading =
-      true; // Nuevo estado para controlar la visibilidad de la animación de carga
+  bool _isLoading = true; // Nuevo estado para controlar la visibilidad de la animación de carga
   var service = HttpService();
   double volumen = 0.0;
 
@@ -117,7 +116,7 @@ class _ControlPageState extends State<ControlPage> {
             ),
           ),
           _isLoading
-              ? SpinKitWave(
+              ? const SpinKitWave(
                   color: Colors.blue, // Color de la animación de carga
                   size: 50.0, // Tamaño de la animación
                 )

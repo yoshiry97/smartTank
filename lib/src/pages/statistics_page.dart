@@ -1,20 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../../http/httpservice.dart';
+import '../../models/things_properties.dart';
 
 class StatisticsPage extends StatefulWidget {
   const StatisticsPage({Key? key}) : super(key: key);
 
   @override
-  _StatisticsPageState createState() => _StatisticsPageState();
+  StatisticsPageState createState() => StatisticsPageState();
 }
 
-class _StatisticsPageState extends State<StatisticsPage> {
-  late double _litros = 10.0;
-  // Variable para almacenar los litros obtenidos de la API
+class StatisticsPageState extends State<StatisticsPage> {
+  late TooltipBehavior _tooltipBehavior;
   var service = HttpService();
   late List accessToken;
-  late TooltipBehavior _tooltipBehavior;
+  Map<String, double> litrosData = {
+    'litrosLunes': 0,
+    'litrosMartes': 0,
+    'litrosMiercoles': 0,
+    'litrosJueves': 0,
+    'litrosViernes': 0,
+    'litrosSabado': 0,
+    'litrosDomingo': 0,
+  };
 
   @override
   void initState() {
@@ -26,19 +34,19 @@ class _StatisticsPageState extends State<StatisticsPage> {
 
   Future<void> _fetchLitrosData() async {
     try {
-      dynamic response = await service.getThings();
-      service.getThingsV2().then(
-        (value) {
-          setState(() {
-            accessToken = value;
-          });
-          value.forEach((element) {
-            if (element.name == 'litros') {
-              
-            }
-          });
-        },
-      );
+      List<ThingsProperty> properties = await service.getThingsV2();
+
+      properties.forEach((element) {
+        if (litrosData.containsKey(element.name)) {
+          if (element.lastValue is int) {
+            litrosData[element.name] = (element.lastValue as int).toDouble();
+          } else if (element.lastValue is double) {
+            litrosData[element.name] = element.lastValue as double;
+          }
+        }
+      });
+      print("Litros Data: $litrosData");
+      setState(() {}); // Actualizar la interfaz con los nuevos valores
     } catch (error) {
       print('Error fetching litros data: $error');
     }
@@ -87,19 +95,17 @@ class _StatisticsPageState extends State<StatisticsPage> {
             series: <LineSeries<UsageData, String>>[
               LineSeries<UsageData, String>(
                 dataSource: <UsageData>[
-                  UsageData('Lunes', 35),
-                  UsageData('Martes', 28),
-                  UsageData('Miércoles', 34),
-                  UsageData('Jueves', 32),
-                  UsageData('Viernes', 40),
-                   UsageData('Sábado', 32),
-                  UsageData('Domingo', 40),
+                  UsageData('Lunes', litrosData['litrosLunes']!),
+                  UsageData('Martes', litrosData['litrosMartes']!),
+                  UsageData('Miercoles', litrosData['litrosMiercoles']!),
+                  UsageData('Jueves', litrosData['litrosJueves']!),
+                  UsageData('Viernes', litrosData['litrosViernes']!),
+                  UsageData('Sabado', litrosData['litrosSabado']!),
+                  UsageData('Domingo', litrosData['litrosDomingo']!),
                 ],
                 xValueMapper: (UsageData uso, _) => uso.day,
-                yValueMapper: (UsageData uso, _) =>
-                    uso.litros, // Corregido aquí
-                // Enable data label
-                dataLabelSettings: DataLabelSettings(isVisible: true),
+                yValueMapper: (UsageData uso, _) => uso.litros,
+                dataLabelSettings: const DataLabelSettings(isVisible: true),
               ),
             ],
           ),

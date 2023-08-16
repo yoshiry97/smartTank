@@ -41,7 +41,6 @@ class HomePage extends StatelessWidget {
 
   Widget _lista()  {
    
-    //menuProvider.cargarData()
     return FutureBuilder(
       future: menuElements.cargarData(),
       initialData: const [],
